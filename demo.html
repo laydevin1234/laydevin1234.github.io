@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script type='text/javascript' src='js/bundle.js'></script>
+    <link rel='stylesheet' type='text/css' href='css/bundle.css'>
+    <link rel='stylesheet' type='text/css' href='css/line-awesome.min.css'>
+</head>
+
+<body class='root'>
+
+    <div class="header"></div>
+
+    <div class="main"> 
+        <div class="aside">
+            <div id="addTitle" style="color: #fff; font-size: 36px; margin-top: 30px;">新增標題</div>
+            <div id="addContent" style="color: #fff; font-size: 24px; margin-top: 10px;">新增內文</div>
+        </div>
+        <div class="content">
+            <div class="graph">
+                <div id="designDiv" class="layout"></div>
+            </div>
+            <div class="footer">
+                <input type="range" id="zoomSlide" min="0" max="100" value="0" step="2" style="width: 250px;">
+            </div>
+        </div>
+    </div> d
+
+
+    <script>
+        const zoomSlide = document.querySelector("#zoomSlide");
+        let graph = document.querySelector(".graph");
+        let layout = document.querySelector(".layout");
+        let preScale = 1;
+
+        let firstTop = 0, firstLeft = 0;
+        let currentTop, currentLeft;
+        const defaultW = layout.offsetWidth;
+        const defaultH = layout.offsetHeight;
+       
+        zoomSlide.addEventListener("input", function () {
+            let scale = 1 + (this.value / 10);
+            currentTop = parseInt(getComputedStyle(layout).top);
+            currentLeft = parseInt(getComputedStyle(layout).left);
+            if (!firstTop) {
+                firstTop = currentTop;
+            }
+            if (!firstLeft) {
+                firstLeft = currentLeft;
+            }
+            layout.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            const rect = layout.getBoundingClientRect();
+            const h = (scale - preScale).toFixed(2) * defaultH;
+            const w = (scale - preScale).toFixed(2) * defaultW;
+            const sy = Math.ceil(h / 2);
+            const sx = Math.ceil(w / 2);
+
+            if (rect.width > (defaultW - 200) && (graph.scrollWidth > graph.clientWidth)) {
+                graph.scrollBy(sx, 0);
+                layout.style.left = currentLeft + sx + 'px';
+            } else if (firstLeft && currentLeft > firstLeft) {
+                graph.scrollBy(-100, 0);
+                layout.style.left = firstLeft + 'px';
+                firstLeft = 0;
+            }
+
+            if (rect.height >= (defaultH - 200) && (graph.scrollHeight > graph.clientHeight)) {
+                graph.scrollBy(0, sy);
+                layout.style.top = currentTop + sy + 'px';
+            } else if (firstTop && currentTop > firstTop) {
+                graph.scrollBy(0, -100);
+                layout.style.top = firstTop + 'px';
+                firstTop = 0;
+            }
+            preScale = scale;
+        });
+
+        const addTitle = document.querySelector('#addTitle')
+        addTitle.addEventListener('click', e => {
+            var tar = document.getElementById("designDiv")
+            $$.YFactory.build(tar, $$.YCore, {
+                top: 100,
+                left: 100,
+                text: '新增標題',
+                fontSize: 36,
+                fontWeight: 'bold'
+            });
+        });
+
+        const addContent = document.querySelector('#addContent')
+        addContent.addEventListener('click', e => {
+            var tar = document.getElementById("designDiv")
+            $$.YFactory.build(tar, $$.YCore, {
+                top: 100,
+                left: 100,
+                text: '新增內文',
+                fontSize: 24,
+                fontWeight: 'normal'
+            });
+        });
+    </script>
+
+</html>
